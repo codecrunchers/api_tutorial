@@ -46,6 +46,11 @@ def create_app():
     with app.app_context():
         db.create_all()
 
+
+    @app.route("/", methods=["GET"])
+    def index():
+        return "<h2>Test API</h2>"
+
     @app.route("/folders", methods=["GET", "POST"])
     def server_request():
         if flask.request.method == 'POST':
