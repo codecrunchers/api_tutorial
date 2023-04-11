@@ -20,11 +20,13 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 
 class AlchemyEncoder(json.JSONEncoder):
 
+    excludes = ["query", "query_class", "registry"]
+
     def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
             # an SQLAlchemy class
             fields = {}
-            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata' and x not in self.excludes]:
                 data = obj.__getattribute__(field)
                 try:
                     json.dumps(data) # this will fail on non-encodable values, like other classes
@@ -40,7 +42,7 @@ class AlchemyEncoder(json.JSONEncoder):
 
 def create_app():
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////test.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite://///tmp/test.db"
     db.init_app(app)
 
     with app.app_context():
@@ -51,17 +53,29 @@ def create_app():
     def index():
         return "<h2>Test API</h2>"
 
-    @app.route("/folders", methods=["GET", "POST"])
+    @app.route("/folders", methods=["GET", "POST", "DELETE", "PUT"])
     def server_request():
         if flask.request.method == 'POST':
             payload = request.json
             f = Folder(name=payload["folder_name"])            
             db.session.add(f)
             db.session.commit()
-            return {"status": json.dumps(f, cls=AlchemyEncoder)}
+            response  = {"status":f}
+            return  json.dumps(response,cls=AlchemyEncoder)
         elif flask.request.method == 'GET':
+            #folder = db.get_or_404(Folder, id)
             fs = Folder.query.all()
-            return {"status":json.dumps(fs,cls=AlchemyEncoder)}
+            response = {"status": fs}
+            return  json.dumps(response,cls=AlchemyEncoder)
+        elif flask.request.method == 'DELETE':
+            id = request.args["id"]
+            f = db.get_or_404(Folder, id)
+            db.session.delete(f)
+            db.session.commit()           
+            response = {"status": f}
+            return  json.dumps(response,cls=AlchemyEncoder)
+        elif flask.request.method == 'PUT':
+            pass
         else:
             return {"status":"error, not implemented"}
 
