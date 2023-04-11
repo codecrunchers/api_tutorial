@@ -9,7 +9,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.11
 servers:
-  - url: https://test-api.org/api/v1/
+  - url: http://88.80.185.224:5000/api/v1/
 paths:
   /folders:
     put:
@@ -43,7 +43,7 @@ paths:
         content: 
           application/json:
             schema:
-              $ref: '#/components/schemas/Folder'
+              $ref: '#/components/schemas/FolderCreate'
         required: true
       responses:
         '200':
@@ -137,6 +137,15 @@ components:
         folder_name:
           type: string
           example: TestDir
+
+    FolderCreate:
+      required:
+        - folder_name
+      type: object
+      properties:
+        folder_name:
+          type: string
+          example: TestDir
         
     ApiResponse:
       type: object
@@ -155,8 +164,10 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Folder'
-        application/xml:
+    FolderCreate:
+      description: Folder object that needs to be added to the store
+      content:
+        application/json:
           schema:
-            $ref: '#/components/schemas/Folder'
-
+            $ref: '#/components/schemas/FolderCreate'
 

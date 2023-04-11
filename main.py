@@ -71,20 +71,20 @@ def create_app():
     def index():
         return "<h2>Test API</h2>"
 
-    @app.route("/folders", methods=["GET"])
+    @app.route("/api/v1/folders", methods=["GET"])
     def query_all():
         folders = db.paginate(db.select(Folder))
         print(folders.items)
         response = {"status": folders.items}
         return render(response)
 
-    @app.route("/folders/<int:folder_id>", methods=["GET"])
+    @app.route("/api/v1/folders/<int:folder_id>", methods=["GET"])
     def query(folder_id):
         f = db.get_or_404(Folder, folder_id) # bug, validate int
         response = {"status": f}
         return render(response)
 
-    @app.route("/folders", methods=["POST", "DELETE", "PUT"])
+    @app.route("/api/v1/folders", methods=["POST", "DELETE", "PUT"])
     def server_request():
         if flask.request.method == 'POST':
             payload = request.json

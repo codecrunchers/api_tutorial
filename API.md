@@ -1,7 +1,9 @@
 # API Name: Test API
 
-## API Root: http://88.80.185.224:5000
+## API Root: http://88.80.185.224:5000/api/v1/
 ## API Content-Type: application/json
+
+## Swagger docs available [here]([http://88.80.185.224:8080/#/default)
 
 ### CREATE 
 Create a new folder
