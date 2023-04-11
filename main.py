@@ -75,7 +75,15 @@ def create_app():
             response = {"status": f}
             return  json.dumps(response,cls=AlchemyEncoder)
         elif flask.request.method == 'PUT':
-            pass
+            payload = request.json
+            folder_name = payload["folder_name"]
+            id = payload["id"]
+            f = db.get_or_404(Folder, id)
+            f.name = folder_name
+            db.session.add(f)
+            db.session.commit()           
+            response = {"status": f}
+            return  json.dumps(response,cls=AlchemyEncoder)
         else:
             return {"status":"error, not implemented"}
 
