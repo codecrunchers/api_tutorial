@@ -76,7 +76,7 @@ All folders
 #### Request type 
 GET
 #### Response
-All folders
+Single Folder
 - 200
 ```json
     {"status": {"id": 1, "name": "dir 1"}}
