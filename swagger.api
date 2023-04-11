@@ -1,0 +1,162 @@
+openapi: 3.0.3
+info:
+  title: Swagger Folder Store - OpenAPI 3.0
+  description: |-
+    This is a Test API
+  
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+servers:
+  - url: https://test-api.org/api/v1/
+paths:
+  /folders:
+    put:
+      summary: Update an existing folder
+      description: Update an existing folder by Id
+      requestBody:
+        description: Update an existent folder in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Folder'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'          
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Folder not found
+        '405':
+          description: Validation exception
+    post:
+      summary: Add a new Folder to the store
+      description: Add a new Folder to the store
+      requestBody:
+        description: Create a new folder in the store
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Folder'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'          
+        '400':
+          description: Invalid input
+          
+    get:
+      summary: Return all folders
+      description: Returns a single Folder
+      parameters:
+        - name: page
+          in: query
+          description: Which page of results to fetch 
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: per_page
+          in: query
+          description: how many results per page
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'          
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Folder not found
+  /folders/{folder_id}:
+    get:
+      summary: Finds Folder by Id
+      description: Return a single folder
+      parameters:
+        - name: folder_id
+          in: path
+          description: Folder Id to filter y
+          required: true
+          schema:
+            type: integer
+            default: -1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Folder'          
+            
+        '400':
+          description: Invalid folder id value
+    delete:
+      summary: Deletes a Folder
+      description: delete a Folder
+      parameters:
+        - name: folder_id
+          in: path
+          description: Folder id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '400':
+          description: Invalid Folder value
+  
+components:
+  schemas:
+    Folder:
+      required:
+        - folder_name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        folder_name:
+          type: string
+          example: TestDir
+        
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  requestBodies:
+    Folder:
+      description: Folder object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Folder'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Folder'
+
+
