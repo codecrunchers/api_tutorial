@@ -46,7 +46,18 @@ Deleted folder
 ```
 
 ### QUERY
+
+- Paginated list of all folders
+
+```
+/folders?per_page=1&page=2
+```
+
 Return all folders
+
+#### Params
+ - page: next page of paginated results, default 1
+ - per_page: , optional defaults to 20
 #### Request type 
 GET
 #### Response
@@ -55,3 +66,24 @@ All folders
 ```json
     {"status": [{"id": 1, "name": "dir 1"}, {"id": 2, "name": "dir 2"}]}
 ```
+
+- Return a single folder
+```
+/folders/<folder_id>
+```
+#### Params
+ - folder_id: id of folder to retrieve
+#### Request type 
+GET
+#### Response
+All folders
+- 200
+```json
+    {"status": {"id": 1, "name": "dir 1"}}
+```
+
+
+### Errors
+
+404 
+Resource not found

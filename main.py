@@ -13,7 +13,7 @@ class Folder(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
 
     def __repr__(self):
-        return '<Folder %r>' % self.username
+        return '<Folder %r>' % self.name
 
 
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -49,43 +49,65 @@ def create_app():
         db.create_all()
 
 
+
+    @app.errorhandler(404)
+    def page_not_found(error):
+        return {"status":"Resource not found, are you sure e.g. the endpoint and id are correct"}, 404
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return {"status":"You have made an invalid request , check your paramaters and endpoint"}, 400
+
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return {"status":"Unhandeled interal error, please report"}, 500
+
+    def render(f):
+        return  json.dumps(f ,cls=AlchemyEncoder)
+
+
     @app.route("/", methods=["GET"])
     def index():
         return "<h2>Test API</h2>"
 
-    @app.route("/folders", methods=["GET", "POST", "DELETE", "PUT"])
+    @app.route("/folders", methods=["GET"])
+    def query_all():
+        folders = db.paginate(db.select(Folder))
+        print(folders.items)
+        response = {"status": folders.items}
+        return render(response)
+
+    @app.route("/folders/<int:folder_id>", methods=["GET"])
+    def query(folder_id):
+        f = db.get_or_404(Folder, folder_id) # bug, validate int
+        response = {"status": f}
+        return render(response)
+
+    @app.route("/folders", methods=["POST", "DELETE", "PUT"])
     def server_request():
         if flask.request.method == 'POST':
             payload = request.json
             f = Folder(name=payload["folder_name"])            
             db.session.add(f)
-            db.session.commit()
-            response  = {"status":f}
-            return  json.dumps(response,cls=AlchemyEncoder)
-        elif flask.request.method == 'GET':
-            #folder = db.get_or_404(Folder, id)
-            fs = Folder.query.all()
-            response = {"status": fs}
-            return  json.dumps(response,cls=AlchemyEncoder)
         elif flask.request.method == 'DELETE':
             id = request.args["id"]
             f = db.get_or_404(Folder, id)
             db.session.delete(f)
-            db.session.commit()           
-            response = {"status": f}
-            return  json.dumps(response,cls=AlchemyEncoder)
         elif flask.request.method == 'PUT':
             payload = request.json
-            folder_name = payload["folder_name"]
-            id = payload["id"]
+            folder_name = payload.get("folder_name")
+            id = payload.get("id")
             f = db.get_or_404(Folder, id)
-            f.name = folder_name
+            f.name = folder_name        
             db.session.add(f)
-            db.session.commit()           
-            response = {"status": f}
-            return  json.dumps(response,cls=AlchemyEncoder)
         else:
             return {"status":"error, not implemented"}
+
+        
+        db.session.commit()
+        response = {"status": f}
+        return render(response)
 
 
     return app
