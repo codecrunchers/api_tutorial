@@ -38,7 +38,8 @@ Updated folder
 Remove a folder
 #### Request type 
 DELETE
-#### Params
+.../folders/1
+#### URL Params
  - id: id of folder to update
 #### Response
 Deleted folder

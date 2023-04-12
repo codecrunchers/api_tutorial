@@ -84,16 +84,21 @@ def create_app():
         response = {"status": f}
         return render(response)
 
-    @app.route("/api/v1/folders", methods=["POST", "DELETE", "PUT"])
+     
+    @app.route("/api/v1/folders/<int:folder_id>", methods=["DELETE"])
+    def delete(folder_id):
+        f = db.get_or_404(Folder, folder_id) # bug, validate int
+        db.session.delete(f)
+        db.session.commit()
+        response = {"status": f}
+        return render(response)
+
+    @app.route("/api/v1/folders", methods=["POST", "PUT"])
     def server_request():
         if flask.request.method == 'POST':
             payload = request.json
             f = Folder(name=payload["folder_name"])            
             db.session.add(f)
-        elif flask.request.method == 'DELETE':
-            id = request.args["id"]
-            f = db.get_or_404(Folder, id)
-            db.session.delete(f)
         elif flask.request.method == 'PUT':
             payload = request.json
             folder_name = payload.get("folder_name")
@@ -101,9 +106,6 @@ def create_app():
             f = db.get_or_404(Folder, id)
             f.name = folder_name        
             db.session.add(f)
-        else:
-            return {"status":"error, not implemented"}
-
         
         db.session.commit()
         response = {"status": f}
