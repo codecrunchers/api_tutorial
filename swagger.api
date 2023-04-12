@@ -57,7 +57,7 @@ paths:
           
     get:
       summary: Return all folders
-      description: Returns a single Folder
+      description: Returns all Folders, paginated
       parameters:
         - name: page
           in: query
@@ -79,7 +79,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Folder'          
+                items:
+                  $ref: '#/components/schemas/Folder'     
+                type: array
         '400':
           description: Invalid ID supplied
         '404':
